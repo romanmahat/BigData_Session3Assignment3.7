@@ -1,0 +1,71 @@
+1.What is NOSQL databases?
+   NoSQL is an approach to database design that can accomodate a wide variety of data models, including key-value, document, 
+   columnar and graph formats. NoSQL, which stand for "not only SQL," is an alternative to traditional relational databases in
+   which data is placed in tables and data schema is carefully designed before the database is built. NoSQL databases are especially 
+   useful for working with large sets of distributed data.
+   
+   
+ 2.How does data get store in NoSQL databases?
+     It is depends on the follwing two thing as follow.
+     
+             In the in-memory databases like Redis/CouchBase/Tarantool/Aerospike everything is stored in RAM in balanced trees like 
+             RB-Tree or in hash tables. All the writes are applied on both RAM and disk, but on disk it goes in an append-only way. 
+             A file append can be done as fast as 100Mbytes per second on a normal magnetic disk. If a record size is, say, 1K, then
+             the data will be written at 100krps.
+
+            In the on-disk NoSQL databases and db-engines like Cassandra/HBase/RocksDB/LevelDB/Sophia the main idea is that you have a
+            snapshot file and a write ahead log (WAL) file. Snapshot contains already prepared data in a form of B-Tree with upper levels 
+            of that tree being permanently in RAM, that can be accesses for reading by doing only one disk seek. A WAL contains all the
+            new changes on top of a current snapshot. A snapshot file is being totally rebuilt on a regular basis using current snapshot
+            and a WAL. All the writes are done nearly as fast as with in-memory databases. "Nearly" because disk is partially busy by
+            doing regular snapshot converting that was described earlier. Reads are significantly slower than that are in in-memory 
+            databases, because they take at least one disk seek, but good news is that they can be cached in optimized in-memory
+            structures like RB-Trees/hash tables.
+
+
+3.What is column faimly in Hbase?
+
+     HBase tables are organized by column, rather than by row. The columns are organized in groups called column families. When creating 
+     a HBase table, we must define the column families before inserting any data. Column families should not be changed often, nor should 
+     there be too many of them, so it is important to think carefully about what column families will be useful for our particular data.
+     Each column family, however, can contain a very large number of columns. Columns are named using the format family:qualifier.
+     
+4.How many maximum number of columns can be added to Hbase table?
+    
+     There is no hard limit to number of columns in HBase , we can have more than 1 million columns but usually three column families 
+     are recommended ( not more than three).If you are using something like Elastic search or Solr for indexing data, it doesn't make 
+     much difference to me.Depending on your data access patterns, you should consider wide table vs tall table layout.
+     
+5.why columns are not define while the time of table creation in Hbase?
+
+    Hbase is a NoSQL databses so in NOSQL databases it is define as schema less.In there we can perfrom ddl operation in any type of data
+    like in RDBMS .THis is the reason columns are not define in HBASE.
+ 
+ 6.How does data manage in HBase?
+    Hbase is natively supported on Hadoop The main characteristics that make Hbase an excellent data management platform are fault
+    tolerance, speed and usability. Fault tolerance is provided by automatic fail-over, automatically sharded and load balanced tables,
+    strong consistency in row level operations and replication. Speed is provided by almost real time lookups, in memory caching and 
+    server side processing. Usability is provided by a flexible data model that allows many uses, a simple Java API and ability to
+    export metrics.
+    
+ 7.What happen internally when new data get inserted in Hbase?
+    when new data get inserted in hbase,Hbase recives a command and persists the change, or throws an exception if the write fails.
+    When a write is made, by default, it goes into Three places:
+    
+                  a. the write-ahead log (WAL), also referred to as the HLog
+                  b. and the MemStore.
+                  c.Hfile
+                  
+         a. The write-ahead log (WAL):its records all changes to data in HBase, to file-based storage. if a RegionServer crashes or 
+                                      becomes unavailable before the MemStore is flushed, the WAL ensures that the changes to the data 
+                                      can be replayed.
+                                      
+         b.The MemStore:The MemStore is a write buffer where HBase accumulates data in memory before a permanent write.Its contents are
+                        flushed to disk to form an HFile when the MemStore fills up.It doesn’t write to an existing HFile but instead 
+                        forms a new file on every flush. © HadoopExam Leaning Resource.
+                        
+         c.Hfile: The HFile is the underlying storage format for HBase.HFiles belong to a column family and a column family can have 
+                  multiple HFiles.But a single HFile can’t have data for multiple column families.
+
+                        
+ 
